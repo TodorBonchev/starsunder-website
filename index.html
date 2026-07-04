@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starsunder - Spaceship Arena Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="stars-canvas"></canvas>
+    
+    <div class="container">
+        <header>
+            <nav class="navbar">
+                <div class="logo">⭐ STARSUNDER</div>
+                <ul class="nav-links">
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#notify">Notify Me</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="glitch" data-text="STARSUNDER">STARSUNDER</h1>
+                <p class="tagline">Intense Spaceship Arena Battles Await</p>
+                <div class="spaceship-icon">🚀</div>
+                <p class="description">Engage in epic multiplayer space combat. Pilot advanced spacecraft, outmaneuver opponents, and claim victory across the stars.</p>
+                
+                <div class="cta-buttons">
+                    <button class="btn btn-primary" onclick="scrollToSection('#notify')">Notify Me on Launch</button>
+                    <button class="btn btn-secondary" onclick="scrollToSection('#about')">Learn More</button>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="asteroid asteroid-1"></div>
+                <div class="asteroid asteroid-2"></div>
+                <div class="asteroid asteroid-3"></div>
+                <div class="planet"></div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <h2>About the Game</h2>
+            <p>Starsunder is an action-packed spaceship arena game where players from around the world compete in intense real-time battles. Master your spacecraft, develop strategic tactics, and become the ultimate space commander.</p>
+        </section>
+
+        <section id="features" class="features">
+            <h2>Game Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚔️</div>
+                    <h3>PvP Combat</h3>
+                    <p>Real-time battles against players worldwide with tactical depth.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛸</div>
+                    <h3>Multiple Vessels</h3>
+                    <p>Choose from diverse spacecraft with unique abilities and stats.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌌</div>
+                    <h3>Dynamic Arenas</h3>
+                    <p>Battle across varied space environments with interactive elements.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3>Ranked Leagues</h3>
+                    <p>Climb the ranks and prove your dominance in competitive play.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Progression System</h3>
+                    <p>Unlock upgrades, customizations, and new content as you advance.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎮</div>
+                    <h3>Cross-Platform</h3>
+                    <p>Play seamlessly across PC, console, and mobile devices.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="notify" class="notify">
+            <h2>Get Ready for Launch</h2>
+            <p>Join our community and be the first to know when Starsunder launches</p>
+            <form class="email-form" onsubmit="handleEmailSubmit(event)">
+                <input type="email" placeholder="Enter your email" required>
+                <button type="submit" class="btn btn-primary">Notify Me</button>
+            </form>
+            <p class="form-note">We'll never spam you. Unsubscribe at any time.</p>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Starsunder. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" class="social-icon">Twitter</a>
+                <a href="#" class="social-icon">Discord</a>
+                <a href="#" class="social-icon">YouTube</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
