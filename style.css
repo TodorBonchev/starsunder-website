@@ -231,6 +231,10 @@ header {
     transition: all 0.3s ease;
     letter-spacing: 1px;
     text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
 }
 
 .btn-primary {
