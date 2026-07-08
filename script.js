@@ -117,22 +117,6 @@ document.querySelectorAll('.feature-card').forEach(card => {
     observer.observe(card);
 });
 
-// Add parallax effect on mouse move
-document.addEventListener('mousemove', (e) => {
-    const asteroids = document.querySelectorAll('.asteroid');
-    const planet = document.querySelector('.planet');
-    
-    const x = (window.innerWidth - e.clientX * 2) / 100;
-    const y = (window.innerHeight - e.clientY * 2) / 100;
-    
-    asteroids.forEach((asteroid, index) => {
-        const offset = (index + 1) * 10;
-        asteroid.style.transform = `translate(${x * offset}px, ${y * offset}px)`;
-    });
-    
-    planet.style.transform = `translate(${x * 5}px, ${y * 5}px)`;
-});
-
 // Add glitch effect periodically
 setInterval(() => {
     const h1 = document.querySelector('h1.glitch');
