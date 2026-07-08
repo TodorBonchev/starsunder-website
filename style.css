@@ -54,11 +54,22 @@ header {
 }
 
 .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     font-size: 28px;
     font-weight: bold;
     color: var(--primary-color);
     text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
     letter-spacing: 2px;
+}
+
+.site-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 0 18px rgba(0, 217, 255, 0.25);
 }
 
 .nav-links {
@@ -98,6 +109,14 @@ header {
     min-height: 600px;
     margin-bottom: 80px;
     position: relative;
+    padding: 60px;
+    border-radius: 24px;
+    border: 1px solid rgba(0, 217, 255, 0.16);
+    background:
+        linear-gradient(135deg, rgba(5, 8, 16, 0.82) 0%, rgba(10, 14, 39, 0.7) 100%),
+        url('starsunder-cover-3.jpg') center/cover;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
 }
 
 .hero-content {
@@ -493,13 +512,25 @@ footer p {
 }
 
 .social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
     color: var(--primary-color);
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
+.social-icon svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+}
+
 .social-icon:hover {
     color: var(--secondary-color);
+    transform: translateY(-2px);
     text-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
 }
 
@@ -509,6 +540,7 @@ footer p {
         grid-template-columns: 1fr;
         gap: 40px;
         min-height: auto;
+        padding: 32px 20px;
     }
 
     .hero-content h1 {

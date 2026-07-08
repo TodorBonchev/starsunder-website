@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0e27">
+    <meta name="description" content="Starsunder is an intense multiplayer spaceship arena game.">
+    <link rel="icon" type="image/png" href="starsunder-logo.png">
+    <link rel="apple-touch-icon" href="starsunder-logo.png">
     <title>Starsunder - Spaceship Arena Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -12,7 +16,10 @@
     <div class="container">
         <header>
             <nav class="navbar">
-                <div class="logo">⭐ STARSUNDER</div>
+                <div class="logo">
+                    <img src="starsunder-logo.png" alt="Starsunder logo" class="site-logo">
+                    <span>STARSUNDER</span>
+                </div>
                 <ul class="nav-links">
                     <li><a href="#about">About</a></li>
                     <li><a href="#features">Features</a></li>
@@ -85,7 +92,11 @@
         <footer>
             <p>&copy; 2026 Starsunder. All rights reserved.</p>
             <div class="social-links">
-                <a href="https://x.com/starsunder_game" target="_blank" rel="noopener noreferrer" class="social-icon">X</a>
+                <a href="https://x.com/starsunder_game" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Visit Starsunder on X">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.596-6.63 7.596H.5l8.63-9.87L0 1.153h7.594l5.243 6.932L18.901 1.153Zm-1.29 20.54h1.427L6.4 3.24H4.838l12.773 18.453Z"/>
+                    </svg>
+                </a>
             </div>
             <p>Built with Unity 6 and Photon Fusion 2 for PC and mobile cross-play.</p>
         </footer>
