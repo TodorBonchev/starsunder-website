@@ -478,6 +478,11 @@ footer a:hover {
     color: var(--secondary-color);
 }
 
+.footer-sep {
+    margin: 0 10px;
+    color: rgba(224, 224, 255, 0.35);
+}
+
 .social-links {
     display: flex;
     gap: 30px;
