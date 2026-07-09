@@ -233,6 +233,17 @@ body {
     animation: fadeUp 0.8s ease 0.2s both;
 }
 
+.hero-content a {
+    color: #f4f7ff;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: rgba(244, 247, 255, 0.45);
+}
+
+.hero-content a:hover {
+    color: #8fe8ff;
+}
+
 .cta-buttons {
     display: flex;
     gap: 20px;
