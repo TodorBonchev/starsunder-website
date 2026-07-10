@@ -69,6 +69,38 @@ function scrollToSection(selector) {
     }
 }
 
+// Beta access modal
+function openBetaModal() {
+    const modal = document.getElementById('beta-modal');
+    const frame = document.getElementById('beta-form-frame');
+
+    // Load the Google Form only when first opened
+    if (!frame.src) {
+        frame.src = frame.dataset.src;
+    }
+
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+}
+
+function closeBetaModal() {
+    const modal = document.getElementById('beta-modal');
+    modal.hidden = true;
+    document.body.style.overflow = '';
+}
+
+document.getElementById('beta-modal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) {
+        closeBetaModal();
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeBetaModal();
+    }
+});
+
 // Email form submission
 function handleEmailSubmit(event) {
     event.preventDefault();
