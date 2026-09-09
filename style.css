@@ -630,8 +630,25 @@ footer a:hover {
         display: none;
     }
 
+    /* A 2.47:1 clip cannot fill a portrait hero. `cover` would keep only ~18% of
+       the frame width, which reads as murk rather than as gameplay -- the nova
+       ring is a smudge at that crop. So phones load a centre-cropped cut instead
+       (see script.js) and show it WHOLE, as a band at its own aspect ratio,
+       feathered top and bottom into the cover art
+       (which stays put here rather than fading out, so the band has something to
+       sit inside instead of floating on the base gradient). */
     .hero-video {
-        display: none;
+        top: 38%;
+        bottom: auto;
+        height: auto;
+        aspect-ratio: 560 / 414;
+        transform: translateY(-50%);
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 24%, #000 76%, transparent 100%);
+        mask-image: linear-gradient(to bottom, transparent 0%, #000 24%, #000 76%, transparent 100%);
+    }
+
+    .hero.has-video::before {
+        opacity: 0.55;
     }
 
     .features-grid {

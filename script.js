@@ -147,17 +147,22 @@ function initHeroVideo() {
     if (!video || !hero || !video.dataset.src) return;
 
     const wantsLessMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const bigEnough = window.matchMedia('(min-width: 769px)').matches;
     const conn = navigator.connection || {};
     const frugal = conn.saveData === true || /(^|-)2g$/.test(conn.effectiveType || '');
 
-    if (wantsLessMotion || !bigEnough || frugal) return;
+    if (wantsLessMotion || frugal) return;
 
     // Crossfade the still out only once frames are actually on screen, so a refused
     // autoplay or a stalled download never leaves the hero empty.
     video.addEventListener('playing', () => hero.classList.add('has-video'), { once: true });
 
-    video.src = video.dataset.src;
+    // Phones get a centre-cropped 560x414 cut of the same clip. The wide one is a
+    // 2.47:1 frame: in a portrait hero `cover` would keep ~18% of its width (murk,
+    // not gameplay) and showing it whole puts the game's touch sticks on screen as
+    // grey blobs. The narrow cut is the widest crop that excludes them, it fills
+    // far more of the hero, and it is 420KB against 614KB.
+    const narrow = window.matchMedia('(max-width: 768px)').matches;
+    video.src = (narrow && video.dataset.srcNarrow) ? video.dataset.srcNarrow : video.dataset.src;
     video.load();
 
     const attempt = video.play();
