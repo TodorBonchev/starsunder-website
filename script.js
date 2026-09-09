@@ -134,3 +134,55 @@ document.addEventListener('keydown', (e) => {
         alert('Starsunder Coming Soon!\n\nNavigate with smooth scrolling or click the buttons above.\nPress "?" anytime to see this message.');
     }
 });
+
+// Hero gameplay loop
+// -----------------------------------------------------------------------------
+// The clip is attached from JS rather than left in the markup so that it is never
+// downloaded on the devices that will not show it. A <video> with a src is fetched
+// even when CSS hides it, so `display: none` alone would still cost phones ~600KB.
+// If anything here bails out, the hero keeps its static cover image unchanged.
+function initHeroVideo() {
+    const video = document.querySelector('.hero-video');
+    const hero = document.querySelector('.hero');
+    if (!video || !hero || !video.dataset.src) return;
+
+    const wantsLessMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const bigEnough = window.matchMedia('(min-width: 769px)').matches;
+    const conn = navigator.connection || {};
+    const frugal = conn.saveData === true || /(^|-)2g$/.test(conn.effectiveType || '');
+
+    if (wantsLessMotion || !bigEnough || frugal) return;
+
+    // Crossfade the still out only once frames are actually on screen, so a refused
+    // autoplay or a stalled download never leaves the hero empty.
+    video.addEventListener('playing', () => hero.classList.add('has-video'), { once: true });
+
+    video.src = video.dataset.src;
+    video.load();
+
+    const attempt = video.play();
+    if (attempt && typeof attempt.catch === 'function') {
+        attempt.catch(() => {
+            // Autoplay refused - drop back to the cover image and free the bytes.
+            hero.classList.remove('has-video');
+            video.removeAttribute('src');
+            video.load();
+        });
+    }
+
+    // Don't decode video for a hero nobody is looking at.
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (!video.src) return;
+                if (entry.isIntersecting) {
+                    video.play().catch(() => {});
+                } else {
+                    video.pause();
+                }
+            });
+        }, { threshold: 0.05 }).observe(hero);
+    }
+}
+
+initHeroVideo();
