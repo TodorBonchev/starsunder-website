@@ -141,6 +141,31 @@ document.addEventListener('keydown', (e) => {
 // downloaded on the devices that will not show it. A <video> with a src is fetched
 // even when CSS hides it, so `display: none` alone would still cost phones ~600KB.
 // If anything here bails out, the hero keeps its static cover image unchanged.
+// Three gameplay frames standing in for the clip. ~112KB for all three against
+// the clip's 420-614KB, so this stays honest on a metered connection. Nothing is
+// fetched until this runs -- the <img> tags carry data-src, not src.
+function showHeroStills(hero, rotate) {
+    const stills = hero.querySelector('.hero-stills');
+    if (!stills) return;
+
+    const frames = Array.prototype.slice.call(stills.querySelectorAll('.hero-still'));
+    if (!frames.length) return;
+
+    if (!rotate) stills.classList.add('is-static');
+
+    // Reveal only once the first frame has decoded, the same rule the clip
+    // follows -- otherwise the cover art crossfades out to nothing.
+    const reveal = () => hero.classList.add('has-stills');
+    frames.forEach((img) => { if (img.dataset.src) img.src = img.dataset.src; });
+
+    if (frames[0].complete) {
+        reveal();
+    } else {
+        frames[0].addEventListener('load', reveal, { once: true });
+        frames[0].addEventListener('error', () => {}, { once: true });
+    }
+}
+
 function initHeroVideo() {
     const video = document.querySelector('.hero-video');
     const hero = document.querySelector('.hero');
@@ -150,7 +175,19 @@ function initHeroVideo() {
     const conn = navigator.connection || {};
     const frugal = conn.saveData === true || /(^|-)2g$/.test(conn.effectiveType || '');
 
-    if (wantsLessMotion || frugal) return;
+    // Both of these deliberately skip the clip -- but skipping it should not mean
+    // falling back to generic cover art. Show real gameplay either way: rotating
+    // for Data Saver (which asked for fewer bytes, not less motion), and holding
+    // on one frame for reduced motion (which asked for the opposite).
+    if (wantsLessMotion) {
+        showHeroStills(hero, false);
+        return;
+    }
+
+    if (frugal) {
+        showHeroStills(hero, true);
+        return;
+    }
 
     // Crossfade the still out only once frames are actually on screen, so a refused
     // autoplay or a stalled download never leaves the hero empty.

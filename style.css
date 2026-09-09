@@ -87,30 +87,84 @@ body {
    existing text stacking is untouched. It fades in only once it is really playing
    and crossfades the still out with it -- so phones, reduced-motion users, slow
    connections and any browser that refuses autoplay keep today's hero exactly. */
+.hero-video,
+.hero-stills {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    pointer-events: none;
+}
+
 .hero-video {
+    object-fit: cover;
+    object-position: center;
+    border: 0;
+}
+
+/* Gameplay stills, shown when the clip is deliberately not downloaded -- Data
+   Saver, or a metered/2g connection. They occupy exactly the same box as the
+   clip, so the hero looks the same on both paths; only the motion differs.
+   The files are 1024x414 like the wide clip, so `cover` crops them to the same
+   centre region the phone-sized clip is cut to. */
+.hero-still {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
-    z-index: 0;
     opacity: 0;
-    transition: opacity 1.2s ease;
-    pointer-events: none;
-    border: 0;
+    animation: heroStillCycle 21s linear infinite;
 }
 
-.hero.has-video .hero-video {
+.hero-still:nth-child(2) {
+    animation-delay: 7s;
+}
+
+.hero-still:nth-child(3) {
+    animation-delay: 14s;
+}
+
+/* Each still holds for ~6s and dissolves over ~0.8s into the next. The windows
+   overlap so the pair cross-fades rather than both dipping toward the backdrop
+   between them. */
+@keyframes heroStillCycle {
+    0% { opacity: 0; }
+    4% { opacity: 1; }
+    33% { opacity: 1; }
+    37% { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+/* Reduced motion gets the stills without the rotation: one frame of real
+   gameplay, holding still. A slideshow is still motion, and that setting is a
+   request not to have any. */
+.hero-stills.is-static .hero-still {
+    animation: none;
+    opacity: 0;
+}
+
+.hero-stills.is-static .hero-still:first-child {
+    opacity: 1;
+}
+
+.hero.has-video .hero-video,
+.hero.has-stills .hero-stills {
     opacity: 0.7;
 }
 
-.hero.has-video::before {
+.hero.has-video::before,
+.hero.has-stills::before {
     opacity: 0;
 }
 
-/* The clip is never fetched on phones or under reduced motion (see script.js);
-   these are the belt-and-braces half of that decision. */
+/* The clip is never fetched under reduced motion (see script.js); this is the
+   belt-and-braces half of that. The stills deliberately are NOT hidden here --
+   they are what reduced motion falls back to. */
 @media (prefers-reduced-motion: reduce) {
     .hero-video {
         display: none;
@@ -637,7 +691,8 @@ footer a:hover {
        feathered top and bottom into the cover art
        (which stays put here rather than fading out, so the band has something to
        sit inside instead of floating on the base gradient). */
-    .hero-video {
+    .hero-video,
+    .hero-stills {
         top: 30%;
         bottom: auto;
         height: auto;
@@ -654,11 +709,13 @@ footer a:hover {
        reported from a phone as no video at all. The clip is near-opaque now and the
        cover art drops back to a floor that keeps the frame from going empty above
        and below the band. */
-    .hero.has-video .hero-video {
+    .hero.has-video .hero-video,
+    .hero.has-stills .hero-stills {
         opacity: 0.95;
     }
 
-    .hero.has-video::before {
+    .hero.has-video::before,
+    .hero.has-stills::before {
         opacity: 0.22;
     }
 
