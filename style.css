@@ -638,17 +638,28 @@ footer a:hover {
        (which stays put here rather than fading out, so the band has something to
        sit inside instead of floating on the base gradient). */
     .hero-video {
-        top: 38%;
+        top: 30%;
         bottom: auto;
         height: auto;
         aspect-ratio: 560 / 414;
         transform: translateY(-50%);
-        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 24%, #000 76%, transparent 100%);
-        mask-image: linear-gradient(to bottom, transparent 0%, #000 24%, #000 76%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+        mask-image: linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    }
+
+    /* The band has to carry the hero on its own here, the way the full-bleed clip
+       does on desktop. The first cut of this dimmed the clip to 0.7, left the cover
+       art at full strength competing with it, feathered away half the band and put
+       it behind the densest text -- four reductions stacked, and the result was
+       reported from a phone as no video at all. The clip is near-opaque now and the
+       cover art drops back to a floor that keeps the frame from going empty above
+       and below the band. */
+    .hero.has-video .hero-video {
+        opacity: 0.95;
     }
 
     .hero.has-video::before {
-        opacity: 0.55;
+        opacity: 0.22;
     }
 
     .features-grid {
