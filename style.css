@@ -399,6 +399,7 @@ body {
 .about h2,
 .features h2,
 .competitive h2,
+.reel h2,
 .notify h2 {
     font-family: 'Orbitron', 'Segoe UI', sans-serif;
     font-size: clamp(32px, 6vw, 48px);
@@ -570,6 +571,437 @@ body {
 
 .btn-discord i {
     font-size: 18px;
+}
+
+/* Combat reel (gameplay clips). One stage, one running decoder; every switch is a cut. */
+.reel {
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(255, 0, 110, 0.05));
+    border: 1px solid rgba(0, 217, 255, 0.2);
+    border-radius: 10px;
+    padding: 48px 40px 40px;
+    margin-bottom: 80px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.reel h2 {
+    margin-bottom: 12px;
+}
+
+.reel-intro {
+    font-size: 18px;
+    color: rgba(224, 224, 255, 0.8);
+    max-width: 640px;
+    margin: 0 auto 32px;
+}
+
+/* The stage reserves its 13:6 box before any media loads, so nothing shifts. It gets its own
+   compositing layer so Safari keeps clipping the rounded corners while the frame scales. */
+.reel-stage {
+    position: relative;
+    aspect-ratio: 13 / 6;
+    border-radius: 10px;
+    overflow: hidden;
+    isolation: isolate;
+    transform: translateZ(0);
+    text-align: left;
+    background: var(--darker-bg);
+    border: 1px solid rgba(0, 217, 255, 0.25);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 48px rgba(0, 217, 255, 0.1);
+}
+
+.reel-tab-frame {
+    position: relative;
+    display: block;
+    aspect-ratio: 13 / 6;
+    overflow: hidden;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 217, 255, 0.2);
+    background: var(--darker-bg);
+    transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+
+@supports not (aspect-ratio: 1 / 1) {
+    .reel-stage::before,
+    .reel-tab-frame::before {
+        content: '';
+        display: block;
+        padding-top: 46.154%;
+    }
+}
+
+/* Frame = poster + two clips. It snaps to 1.03 under the closed shutter on a USER cut only
+   and settles back as the shutter opens, so a chosen clip lands like an edit. */
+.reel-frame {
+    position: absolute;
+    inset: 0;
+    transform: scale(1);
+    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reel-stage.is-cutting-user .reel-frame {
+    transform: scale(1.03);
+    transition: none;
+}
+
+.reel-poster,
+.reel-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border: 0;
+    display: block;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 250ms ease-out;
+}
+
+.reel-stage.has-poster .reel-poster {
+    opacity: 1;
+}
+
+/* The poster is frame 0 of the same encode, so this fade is invisible. */
+.reel-stage.is-playing .reel-video.is-front {
+    opacity: 1;
+}
+
+/* Shutter: 120ms to dark, 180ms back out onto the next clip's first frame. */
+.reel-stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: var(--darker-bg);
+    opacity: 0;
+    transition: opacity 180ms ease-out;
+    pointer-events: none;
+}
+
+.reel-stage.is-cutting::after {
+    opacity: 1;
+    transition: opacity 120ms ease-in;
+}
+
+/* Slow-network hint, only if a clip takes longer than 600ms to start. */
+.reel-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 3;
+    background: var(--primary-color);
+    opacity: 0;
+    transform-origin: left;
+}
+
+.reel-stage.is-loading .reel-loading {
+    animation: reelLoading 1.2s ease-in-out 600ms infinite;
+}
+
+@keyframes reelLoading {
+    0% { opacity: 0.9; transform: scaleX(0); }
+    50% { opacity: 0.9; transform: scaleX(1); }
+    100% { opacity: 0; transform: scaleX(1); }
+}
+
+/* Whole-stage play/pause button. The glyph shows only when nothing is moving or loading;
+   the corner chip only while playing. Nothing here uses backdrop-filter over live video. */
+.reel-toggle {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.reel-toggle:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -3px;
+    border-radius: 10px;
+}
+
+.reel-toggle-glyph {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.45);
+    opacity: 0;
+    transform: scale(0.85);
+    pointer-events: none;
+    transition: opacity 250ms ease-out, transform 250ms ease-out, box-shadow 300ms ease;
+}
+
+.reel-toggle-glyph svg {
+    margin-left: 4px;
+}
+
+.reel-stage.is-idle .reel-toggle-glyph,
+.reel-stage.is-paused .reel-toggle-glyph {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.reel-toggle:hover .reel-toggle-glyph {
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.6);
+}
+
+.reel-toggle-size {
+    display: none;
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: rgba(224, 224, 255, 0.75);
+}
+
+.reel-stage.is-frugal.is-idle .reel-toggle-size {
+    display: block;
+}
+
+.reel-toggle-chip {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(5, 8, 16, 0.6);
+    border: 1px solid rgba(0, 217, 255, 0.35);
+    color: var(--primary-color);
+    opacity: 0;
+    transition: opacity 200ms ease, border-color 200ms ease;
+}
+
+.reel-stage.is-playing:not(.is-paused):hover .reel-toggle-chip,
+.reel-stage.is-playing:not(.is-paused):focus-within .reel-toggle-chip {
+    opacity: 1;
+}
+
+.reel-stage.no-video .reel-toggle {
+    display: none;
+}
+
+.reel-expand {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 5;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 8px;
+    background: rgba(5, 8, 16, 0.6);
+    border: 1px solid rgba(0, 217, 255, 0.35);
+    color: var(--primary-color);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.reel-stage:hover .reel-expand,
+.reel-stage:focus-within .reel-expand {
+    opacity: 1;
+}
+
+.reel-expand:hover,
+.reel-expand:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 16px rgba(0, 217, 255, 0.35);
+}
+
+.reel-expand:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.reel-expand .icon-compress {
+    display: none;
+}
+
+.reel-stage.is-fullscreen .reel-expand .icon-expand {
+    display: none;
+}
+
+.reel-stage.is-fullscreen .reel-expand .icon-compress {
+    display: block;
+}
+
+.reel-stage.no-fullscreen .reel-expand,
+.reel-stage.ios-fs:not(.is-playing):not(.is-paused) .reel-expand {
+    display: none;
+}
+
+.reel-stage:fullscreen,
+.reel-stage:-webkit-full-screen {
+    border: 0;
+    border-radius: 0;
+    background: #000;
+}
+
+.reel-stage:fullscreen .reel-video,
+.reel-stage:fullscreen .reel-poster,
+.reel-stage:-webkit-full-screen .reel-video,
+.reel-stage:-webkit-full-screen .reel-poster {
+    object-fit: contain;
+}
+
+/* Live region: visually hidden unless it carries an error. */
+.reel-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    margin: 0;
+}
+
+.reel-stage.is-error + .reel-status {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+    white-space: normal;
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+/* Rail (tablist) */
+.reel-rail {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.reel-tab {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    text-align: center;
+    color: rgba(224, 224, 255, 0.7);
+    font-family: 'Orbitron', 'Segoe UI', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 200ms ease;
+}
+
+.reel-tab-frame img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    opacity: 0.6;
+    transition: opacity 200ms ease;
+}
+
+.reel-tab:hover .reel-tab-frame {
+    border-color: rgba(0, 217, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+.reel-tab:hover img,
+.reel-tab[aria-selected="true"] img {
+    opacity: 1;
+}
+
+.reel-tab[aria-selected="true"] {
+    color: var(--primary-color);
+}
+
+.reel-tab[aria-selected="true"] .reel-tab-frame {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 18px rgba(0, 217, 255, 0.35);
+}
+
+.reel-tab:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+    border-radius: 8px;
+}
+
+.reel-tab-title {
+    display: block;
+    margin-top: 8px;
+    line-height: 1.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.reel-tab-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    z-index: 1;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 250ms linear;
+}
+
+/* Keep the ring off mouse clicks only where :focus-visible exists (pre-15.4 Safari keeps :focus). */
+.reel-toggle:focus:not(:focus-visible),
+.reel-expand:focus:not(:focus-visible),
+.reel-tab:focus:not(:focus-visible) {
+    outline: none;
+}
+
+@media (hover: none) {
+    .reel-expand,
+    .reel-stage.is-playing:not(.is-paused) .reel-toggle-chip {
+        opacity: 0.85;
+    }
+
+    .reel-tab:hover .reel-tab-frame {
+        transform: none;
+    }
 }
 
 /* Notify Section */
@@ -744,7 +1176,8 @@ footer a:hover {
 
     .about h2,
     .features h2,
-    .competitive h2 {
+    .competitive h2,
+    .reel h2 {
         font-size: clamp(24px, 7vw, 34px);
     }
 
@@ -836,6 +1269,82 @@ footer a:hover {
         min-width: 54px;
         min-height: 54px;
     }
+
+    /* Combat reel on phones: the stage is the panel, the rail scrolls sideways (2.5 tabs at 360px). */
+    .reel {
+        background: none;
+        border: 0;
+        backdrop-filter: none;
+        padding: 0;
+        margin-bottom: 40px;
+    }
+
+    .reel .eyebrow,
+    .reel h2,
+    .reel-intro {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .reel h2 {
+        margin-bottom: 8px;
+    }
+
+    .reel-intro {
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    .reel-toggle-glyph {
+        width: 64px;
+        height: 64px;
+    }
+
+    .reel-toggle-chip,
+    .reel-expand {
+        width: 36px;
+        height: 36px;
+    }
+
+    .reel-toggle-chip {
+        right: 10px;
+        bottom: 10px;
+    }
+
+    .reel-expand {
+        top: 10px;
+        right: 10px;
+    }
+
+    .reel-rail {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        padding: 6px 2px 8px;
+        margin-top: 12px;
+        scrollbar-width: none;
+    }
+
+    .reel-rail::-webkit-scrollbar {
+        display: none;
+    }
+
+    .reel-tab {
+        flex: 0 0 132px;
+        scroll-snap-align: start;
+        font-size: 10px;
+    }
+
+    .reel-tab-title {
+        margin-top: 6px;
+    }
+
+    .reel-tab:hover .reel-tab-frame {
+        transform: none;
+    }
 }
 
 @media (max-width: 480px) {
@@ -872,5 +1381,38 @@ footer a:hover {
 
     .description {
         margin-bottom: 16px;
+    }
+}
+
+/* Reduced motion for the combat reel: instant swaps, no push-in, no pulses, no lifts. The clip is
+   NOT hidden the way the hero's is, because here the visitor may press Play and ask for it. */
+@media (prefers-reduced-motion: reduce) {
+    .reel-stage::after,
+    .reel-frame,
+    .reel-poster,
+    .reel-video,
+    .reel-toggle-glyph,
+    .reel-toggle-chip,
+    .reel-expand,
+    .reel-tab,
+    .reel-tab-frame,
+    .reel-tab-frame img,
+    .reel-tab-progress {
+        transition: none;
+    }
+
+    .reel-stage.is-cutting-user .reel-frame,
+    .reel-tab:hover .reel-tab-frame {
+        transform: none;
+    }
+
+    .reel-stage.is-loading .reel-loading {
+        animation: none;
+        opacity: 0.9;
+        transform: none;
+    }
+
+    .reel-rail {
+        scroll-behavior: auto;
     }
 }
